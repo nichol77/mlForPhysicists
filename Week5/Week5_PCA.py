@@ -137,21 +137,37 @@ P=np.dot(x,vecs)
 print("x.shape:",x.shape)
 print("P.shape:",P.shape)
 newImage2=(np.dot(P[:,0:2],vecs.T[0:2,:]))+mu
+newImage10=(np.dot(P[:,0:10],vecs.T[0:10,:]))+mu
+newImage50=(np.dot(P[:,0:50],vecs.T[0:50,:]))+mu
 newImage100=(np.dot(P[:,0:100],vecs.T[0:100,:]))+mu
+newImage200=(np.dot(P[:,0:200],vecs.T[0:200,:]))+mu
+newImage500=(np.dot(P[:,0:500],vecs.T[0:500,:]))+mu
 newImage784=(np.dot(P[:,:],vecs.T[:,:]))+mu
 
-# +
-fig,ax=plt.subplots(1,4)
-ax[0].imshow(np.flipud(np.reshape(X[4,:],[28,28])), origin='lower',cmap='binary',interpolation='nearest')
-ax[0].set_title("Original")
-ax[1].imshow(np.flipud(np.reshape(newImage2[4,:],[28,28])), origin='lower',cmap='binary',interpolation='nearest')
-ax[1].set_title("2 PCs")
-ax[2].imshow(np.flipud(np.reshape(newImage100[4,:],[28,28])), origin='lower',cmap='binary',interpolation='nearest')
-ax[2].set_title("100 PCs")
-ax[3].imshow(np.flipud(np.reshape(newImage784[4,:],[28,28])), origin='lower',cmap='binary',interpolation='nearest')
-ax[3].set_title("All PCs")
+fig,ax=plt.subplots(2,4)
+whichImage=7
+ax[0,0].imshow(np.flipud(np.reshape(X[whichImage,:],[28,28])), origin='lower',cmap='binary',interpolation='nearest')
+ax[0,0].set_title("Original")
+ax[0,1].imshow(np.flipud(np.reshape(newImage2[whichImage,:],[28,28])), origin='lower',cmap='binary',interpolation='nearest')
+ax[0,1].set_title("2 PCs")
+ax[0,2].imshow(np.flipud(np.reshape(newImage10[whichImage,:],[28,28])), origin='lower',cmap='binary',interpolation='nearest')
+ax[0,2].set_title("10 PCs")
+ax[0,3].imshow(np.flipud(np.reshape(newImage50[whichImage,:],[28,28])), origin='lower',cmap='binary',interpolation='nearest')
+ax[0,3].set_title("50 PCs")
+ax[1,0].imshow(np.flipud(np.reshape(newImage100[whichImage,:],[28,28])), origin='lower',cmap='binary',interpolation='nearest')
+ax[1,0].set_title("100 PCs")
+ax[1,1].imshow(np.flipud(np.reshape(newImage200[whichImage,:],[28,28])), origin='lower',cmap='binary',interpolation='nearest')
+ax[1,1].set_title("200 PCs")
+ax[1,2].imshow(np.flipud(np.reshape(newImage500[whichImage,:],[28,28])), origin='lower',cmap='binary',interpolation='nearest')
+ax[1,2].set_title("500 PCs")
+ax[1,3].imshow(np.flipud(np.reshape(newImage784[whichImage,:],[28,28])), origin='lower',cmap='binary',interpolation='nearest')
+ax[1,3].set_title("All PCs")
+plt.subplots_adjust(left=0.05,
+                    bottom=0.2, 
+                    right=0.9, 
+                    top=0.9, 
+                    wspace=0.3, 
+                    hspace=0.3)  #Ad
 
-
-# -
 
 
