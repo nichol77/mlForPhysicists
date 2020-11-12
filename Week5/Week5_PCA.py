@@ -31,11 +31,11 @@
 #
 # Let $V$ denote the matrix whose columns are $v$, and $\Lambda$ the diagonal matrix whose elements are the eigenvalues. Then the full family of eigenvalue equations can be written as
 # $$A V =  V \Lambda $$
-# where the ordering on the right is to make sure that the columnwise eigenvectors are multiplied by there corresponding eigenvalues.
+# where the ordering on the right is to make sure that the columnwise eigenvectors are multiplied by there corresponding eigenvalues. Now assumming our eigenvevctors are linearly independent (which we know is true for eigenvectors from quantum mechanics) then $V^{-1}$ exists and we can write
+# $$ A = V \Lambda V^{-1} $$
 #
 # #### Singular Value Decomposition
-# For rectangular matrices the equivalent of eigenvalue decomposition is singular value decompoisiton. Where our matrix $X$ is rewritten such that $X=USV^T$ where $S$ is a diagonal matrix of the singular values and $U$ & $V$ are unitary matrices whose columns are the left and right singular vectors $X$. Now assumming our eigenvevctors are linearly independent (which we know is true for eigenvectors from quantum mechanics) then $X^-1$ exists and we can write
-# $$ A = V \Lambda V^-1 $$
+# For rectangular matrices the equivalent of eigenvalue decomposition is singular value decompoisiton. Where our matrix $X$ is rewritten such that $X=USV^T$ where $S$ is a diagonal matrix of the singular values and $U$ & $V$ are unitary matrices whose columns are the left and right singular vectors $X$. 
 #
 # Writing $X$ this way allows us to write the covariance matrix as:
 # $$\Sigma(X)=\frac{1}{N-1}VSU^TUSV^T$$
