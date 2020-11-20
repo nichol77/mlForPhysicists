@@ -122,6 +122,7 @@ fig,ax=plt.subplots(figsize=(7,5))
 im=ax.imshow(test_output,origin='lower',interpolation='nearest',aspect='auto')
 ax.set_xlabel("Epoch")
 ax.set_ylabel("Time step")
+ax.set_yticks(np.arange(timesteps))
 cb = fig.colorbar(im)
 
 # So here time (in the 20 step sequence) runs up the screen, whilst our time (measured in number fo training epochs) runs across the screen. The LSTM network gets better at only returning a value in the desired location but there is some tail bleeding into higher timesteps.
@@ -240,6 +241,7 @@ fig,ax=plt.subplots(figsize=(7,5))
 im=ax.imshow(test_output,origin='lower',interpolation='nearest',aspect='auto')
 ax.set_xlabel("Epoch")
 ax.set_ylabel("Time step")
+ax.set_yticks(np.arange(timesteps))
 cb = fig.colorbar(im)
 
 # +
@@ -331,6 +333,7 @@ im=ax.imshow(test_output,origin='lower',interpolation='nearest',aspect='auto')
 ax.set_title("Countdown Network")
 ax.set_xlabel("Epoch")
 ax.set_ylabel("Time step")
+ax.set_yticks(np.arange(timesteps))
 cb = fig.colorbar(im)
 
 # Now: try to inspect output of LSTM neurons at intermediate times. This is also a nice example of how to use some smart keras functionality.
@@ -354,7 +357,8 @@ im=ax.imshow(the_values[0,:,:],origin='lower',interpolation='nearest',aspect='au
 ax.set_title("Neuron Value")
 ax.set_xlabel("1st LSTM Index")
 ax.set_ylabel("Time step")
-cb = fig.colorbar(im)
 ax.set_xticks([0,1])
+ax.set_yticks(np.arange(timesteps))
+cb = fig.colorbar(im)
 
 
