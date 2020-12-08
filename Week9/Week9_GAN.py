@@ -287,8 +287,36 @@ def generate_and_save_images(model, epoch, test_input):
 # # Step 8: Do the training
 # Now that we have set up all the training loops we can try and train our networks. Training GANs is challenging. As the two networks battle against each other it is important that they learn at a similar rate, if one gets on top too early than neither will learn efficiently.
 #
-# This step is slow, on my (not so good) laptop it takes over two minutes per epoch.
+# This step is slow, on my (not so good) laptop it takes almost three minutes per epoch. Running on Google Colab without GPUs the it was over 10 minutes per epoch. But running on Google Colab with [GPUs enabled](https://colab.research.google.com/notebooks/gpu.ipynb) it took about 12 seconds per epoch. A speedup of almost a factor of 60! Of course your mileage may vary, or you may have access to local GPU resources.
 
 train(train_dataset, EPOCHS)
+
+# #### Restore the checkpoint
+
+checkpoint.restore(tf.train.latest_checkpoint(checkpoint_dir))
+
+# # Step 9: Make an animated GIF
+#
+
+# +
+anim_file = 'dcgan.gif'
+
+with imageio.get_writer(anim_file, mode='I') as writer:
+  filenames = glob.glob('image*.png')
+  filenames = sorted(filenames)
+  for filename in filenames:
+    image = imageio.imread(filename)
+    writer.append_data(image)
+  image = imageio.imread(filename)
+  writer.append_data(image)
+# -
+
+# # Step 10: Look at the gif
+# There are ways to display the GIF from the python code, or you can just do it using Markdown like I have done here.
+# ![Numbers](dcgan.gif "numbers")
+
+#Here is an example of the same thing but from the python cell using IPython
+from IPython.display import Image
+Image(filename="dcgan.gif")
 
 
