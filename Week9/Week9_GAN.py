@@ -262,8 +262,8 @@ def train(dataset, epochs):
 
         gen_loss_array[epoch]=np.mean(gloss)
         disc_loss_array[epoch]=np.mean(dloss)
-        gen_loss_err[epoch]=np.stddev(gloss)
-        disc_loss_err[epoch]=np.stddev(dloss)
+        gen_loss_err[epoch]=np.std(gloss)
+        disc_loss_err[epoch]=np.std(dloss)
 
         # Produce images for the GIF as we go
         display.clear_output(wait=True)
@@ -343,8 +343,8 @@ with imageio.get_writer(anim_file, mode='I') as writer:
 
 fig,ax=plt.subplots()
 epochs=np.arange(EPOCHS)
-ax.plot(epochs,gen_loss_array,dy=gen_loss_err,label="Generator Loss")
-ax.plot(epochs,disc_loss_array,dy=disc_loss_err,label="Discriminator Loss")
+ax.errorbar(epochs,gen_loss_array,yerr=gen_loss_err,label="Generator Loss")
+ax.errorbar(epochs,disc_loss_array,yerr=disc_loss_err,label="Discriminator Loss")
 ax.set_xlabel("Training Epoch")
 ax.set_ylabel("Loss")
 ax.legend()
