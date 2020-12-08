@@ -249,22 +249,21 @@ def train_step(images):
 def train(dataset, epochs):
     for epoch in range(epochs):
         start = time.time()
-        gloss=0
-        glossSq=0
-        dloss=0
-        dlossSq=0
+        
         N=len(dataset)
+        gloss=np.zeros(N)
+        dloss=np.zeros(N)
+        i=0
         for image_batch in dataset:
             gl,dl=train_step(image_batch)
-            gloss+=gl
-            glossSq+=gl**2
-            dloss+=dloss
-            dlossSq+=dl**2
+            gloss[i]=gl
+            dloss[i]=dl
+            i+=1
 
-        gen_loss_array[epoch]=gloss/N
-        disc_loss_array[epoch]=dloss/N
-        gen_loss_err[epoch]=np.sqrt(glossSq-gloss**2)/N
-        disc_loss_err[epoch]=np.sqrt(dlossSq-dloss**2)/N
+        gen_loss_array[epoch]=np.mean(gloss)
+        disc_loss_array[epoch]=np.mean(dloss)
+        gen_loss_err[epoch]=np.stddev(gloss)
+        disc_loss_err[epoch]=np.stddev(dloss)
 
         # Produce images for the GIF as we go
         display.clear_output(wait=True)
@@ -339,6 +338,8 @@ with imageio.get_writer(anim_file, mode='I') as writer:
 #from IPython.display import Image
 #Image(filename="dcgan.gif")
 # -
+
+# # Step 11: Look at the loss vs epoch training graph
 
 fig,ax=plt.subplots()
 epochs=np.arange(EPOCHS)
