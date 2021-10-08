@@ -91,17 +91,17 @@ bMax=1
 w=np.random.uniform(low=-1*wMax,high=wMax,size=(Nout,Nin))
 b=np.random.uniform(low=-1*bMax,high=bMax,size=(Nout))
 
-print(b)
-print(w)
-print(w[0])
+print("b=",b)  #Print bias vector
+print("w=",w) #Print weight matrix
+print("w[0]=",w[0])  #Print first row of weight matrix
 # -
 
 #Input data
 x=np.array([0.1,0.4,0.6,0.2])
 
 #Apply the network first by working out Wx+b and then by applying the sigmoid
-y=np.dot(w,x)+b
-z=1/(1+np.exp(-y))
+y=np.dot(w,x)+b    #The np.dot function is caclulating the inner product (dot) of w and x
+z=1/(1+np.exp(-y))  #z here is matrix where every elemtent is filled with 1/(1+e^{-y}) using the appropriate cell of the y matrix
 
 #Now amid much fanfare we can print out the results... which aren't enormously exciting
 print("Input data x:",x)
@@ -192,9 +192,9 @@ print(evaluate_network([0.5,0.5]))
 
 # +
 #Define our input values (50 steps from -1 to 1)
-x1=np.linspace(-1,1,50)  #Input x1 vals
+x1=np.linspace(-1,1,50)  #Input x1 vals, 50 values linearly spaced from -1, 1
 x2=np.linspace(-1,1,50)  #Input x2 vals
-z=np.zeros((50,50))  # Placeholder array full of zeros for the output
+z=np.zeros((50,50))  # Placeholder for a 50x50 array full of zeros for the output
 
 #For clarity lets fill our output array by explictly looping over the x and y indices
 #This is not the quickest way to do this operation... but we will come back to that later
@@ -286,22 +286,22 @@ ax[1].set_title('x2')
 ax[1].xaxis.set_ticks_position('bottom') #Move the x-axis to the bottom (personal preference)
 # -
 
-x1flat=x1v.flatten()
+#x1v and x2v are 2-D arrays where each columnin x1v haveing the same value and each row in x2v having the same value
+x1flat=x1v.flatten()  #Flatten the 50x50 2-D array into a 2500 element 1d array
 x2flat=x2v.flatten()
-Nparallel=np.shape(x1flat)[0]
-print(np.shape(x1flat))
-print("Nparallel:",Nparallel)
-xTest=np.zeros((Nparallel,2))
+Nparallel=np.shape(x1flat)[0]  #This is a numpy way of getting the length of the first dimension of an array
+print(np.shape(x1flat))  #Just calling np.shape returns a tuple
+print("Nparallel:",Nparallel) #But the first element of that tuple is the length
+xTest=np.zeros((Nparallel,2)) # Now need to create the input, which will need to have a shape which is (2500,2)
 xTest[:,0]=x1flat # fill first component (index 0)
 xTest[:,1]=x2flat # fill second component
+print("np.shape(xTest):",np.shape(xTest))
 
-
+#Now we can evaluate our network on all 2500 pairs of x1 and x2 in parallel
 z=evaluate_network_parallel(xTest)
 print("z.shape:",np.shape(z))
 
-# +
-z2d=z.reshape((len(x1),len(x2)))
-
+z2d=z.reshape((len(x1),len(x2)))  #Reshape the 2500,1 array into one which is 50x50
 #Now plot the results
 fig, ax = plt.subplots() #Get the fig and ax objects for the plot 
 im=ax.matshow(z2d,origin='lower',extent=(-1,1,-1,1)) #Plot the output z as a colormap with the origin in the bottom left
@@ -312,7 +312,6 @@ ax.set_xticks(np.linspace(-1,1,6)) #Use a reasonable number and range of ticks
 ax.set_yticks(np.linspace(-1,1,6))
 ax.set_xlabel("x_1") #Slightly uninteresting labels
 ax.set_ylabel("x_2")
-# -
 
 # ## Now let's spice things up by adding lots of hidden layers
 # This is just to illustrate that with enough hidden layers (and layers of a big enough size) some very complicated structures can be achieved.
@@ -397,7 +396,7 @@ ax.set_ylabel("x_2")
 # +
 # With our simple ReLU since the numbers can get arbritrarily large (in the positive direction) we typically need 
 # to start with smaller weights and biases than with the sigmoid which is constrained to lie between -1 and 1
-wMax=0.4
+wMax=0.2
 bMax=0.2
 
 #Initialize the weights and biases with random numbers
