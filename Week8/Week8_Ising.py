@@ -6,7 +6,7 @@
 #       extension: .py
 #       format_name: light
 #       format_version: '1.5'
-#       jupytext_version: 1.7.1
+#       jupytext_version: 1.13.2
 #   kernelspec:
 #     display_name: Python 3
 #     language: python
@@ -94,9 +94,9 @@ print("Energy: ",get_energy(spins,1))
 
 # -
 
-# ## The Metropolis-Hastings Algorithm
+# ## The ~~Metropolis~~ Rosenbluth-Hastings Algorithm
 #
-# The Metropolis-Hastings algorithm is:
+# The ~~Metropolis~~ Rosenbluth-Hastings algorithm is:
 # 1. Pick a random point in the grid
 # 2. Compute the energy difference in the spin in that location is flipped, $dE$
 # 3. If $dE<0$ flip the spin, otherwise randomly flip the spin with probability $p(dE) = e^{- \beta dE}$ where $\beta=\frac{1}{k_{B}T}$

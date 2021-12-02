@@ -5,7 +5,7 @@
 #       extension: .py
 #       format_name: light
 #       format_version: '1.5'
-#       jupytext_version: 1.7.1
+#       jupytext_version: 1.13.2
 #   kernelspec:
 #     display_name: Python 3
 #     language: python
@@ -134,9 +134,9 @@ eta=0.1
 nsteps=500
 skipsteps=10
 
-a=np.random.randn(num_visible)
-b=np.random.randn(num_hidden)
-w=np.random.randn(num_visible,num_hidden)
+a=np.random.randn(num_visible)  #Biases on visible
+b=np.random.randn(num_hidden)  #Biases on hidden
+w=np.random.randn(num_visible,num_hidden)  # Weights between hidden and visible
 
 test_samples=np.zeros([num_visible,nsteps])
 
