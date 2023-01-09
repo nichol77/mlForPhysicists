@@ -25,12 +25,15 @@
 # ### Imports: only numpy and matplotlib
 
 # +
-#from numpy import array, zeros, exp, random, dot, shape, reshape, meshgrid, linspace
-import numpy as np
+import numpy as np  #import the numpy library as np
+import matplotlib.pyplot as plt #import the pyplot library as plt
+import matplotlib.style #Some style nonsense
+import matplotlib as mpl #Some more style nonsense
 
-import matplotlib.pyplot as plt # for plotting
-import matplotlib
-matplotlib.rcParams['figure.dpi']=300 # highres display
+#Set default figure size
+#mpl.rcParams['figure.figsize'] = [12.0, 8.0] #Inches... of course it is inches
+mpl.rcParams["legend.frameon"] = False
+mpl.rcParams['figure.dpi']=150 # dots per inch
 
 # for nice inset colorbars:
 from mpl_toolkits.axes_grid1.inset_locator import inset_axes
@@ -38,7 +41,18 @@ from mpl_toolkits.axes_grid1.inset_locator import inset_axes
 
 # -
 
-# ### Functions
+# ## Neural Network Visualisation Functions
+#
+# Now before you go any further remember the highly overused words of Douglas Adams and **Don't Panic**. It is not expected that you immeidately understand all of the code in the following cell. However you will find if you look at any of the given lines or functions you will be able to piece together what the code is doing.
+#
+# To help you we will explain some of thing functions
+# * `apply_layer(y_in,w,b,activation)` this is the function that calculated a layer of the neural network basically returning  $f(w \cdot y +b)$ where f is the named activation function
+# * `apply_net(y_in,weights,biases,activations)` this function loops over all layers and caluclates the full network
+# * `plot` functions just plot either neurons or connections in our simple network diagrams
+# * `visualize_network` this is the function you call which plots both the network diagram and then the 2D surface of the network output over the range specified.
+#
+# My recommendation is that you don't worry too much about the code but go and look at the outputs of the simple networks below.
+#
 
 # +
 def apply_layer(y_in,w,b,activation):
@@ -62,6 +76,8 @@ def apply_layer(y_in,w,b,activation):
         return(z)
     elif activation=='reLU':
         return((z>0)*z)
+    else:
+        print("Unknown activation function, only sigmoid, jump, linear and reLU supported")
 
 def apply_net(y_in,weights,biases,activations):
     """
@@ -190,7 +206,32 @@ def visualize_network(weights,biases,activations,
     plt.show()
 
 
+# -
+
+# ## Some network visualisations
+#
+#
+# Now remember, because we want to plot the network output as a 2D plot we are restricted (for now) to networks that have two input values $x_0$ and $x_1$ and return a single output value $y_{out}$. For this style of network we can visualise the network output by defining a 2D grid of pairs of input values (e.g. one point will be $x_0=-3$ and $x_1=3$ which will be in the top left-hand corner of the plot below) the colour plotted in that pixel location will be the network output with those input values.
+#
+# ### Simplest possible network visualisation
+#
+# The simplest possible network with 1 output node and 2 input nodes is the one which has no hidden layers. So the two input nodes are both connected to the output node (with different weights) and then a bias can be added. So let us set our weights to be 0.2 for $x_0$ and 0.9 for $x_1$ and our bias to be $b=0.5$ then the network below will calculate
+# $$ y_{out} =  f(0.2 x_0 + 0.9 x_1 + 0.5)$$
+# where $f$ is our activation function (in the default case the sigmoid function).
+#
+# When we plot this over the $x_0$, $x_1$ grid we would expect the gradient in the $x_1$ direction to be much stronger than the gradient in the $x_0$ direction since the biases are 0.9 vs 0.2.
+#
+# Below we will also draw the network diagram with the input nodes at the bottom and the output nodes at the top, positive weights will be blue and negative weights red, the opacity of the line will represent the magnitude of the weight.
+#
+#
+
 # + tags=[]
+#Call the visualize_network function
+# weights is a 3D list of the weights connecting the various layers
+# in this case we just have input and output layers so one layer of weights connecting them
+# e.g. [[[w_0,w_1]]]
+# Since we only have one output neuron (and no hidden) our 2D list of biases just contains a single number
+# [[b_output]]
 visualize_network(weights=[ [ 
     [0.2,0.9]  # weights of 2 input neurons for single output neuron
     ] ],
@@ -202,6 +243,14 @@ visualize_network(weights=[ [
     x0range=[-3,3],x1range=[-3,3])
 
 # + tags=[]
+#Call the visualize_network function
+# weights is a 3D list of the weights connecting the various layers
+# in this case we have added 4 hidden nodes in a single layer between the input and output layers so our weights list is more complicated
+# e.g. [ [[w1_00,w1_01],[w1_10,w1_11],[w1_20,w1_21],[w1_30,w1_31]] , [ [w2_00,w2_01,w2_02,w2_03] ] ]
+# We still have a single bias value for the output layer but no we have four bias values for the hidden layer
+# [[b1_0,b1_1,b1_2,b1_3],[b_output]]
+
+
 visualize_network(weights=[ [ 
     [0.2,0.9],  # weights of 2 input neurons for 1st hidden neuron
     [-0.5,0.3], # weights of 2 input neurons for 2nd hidden
