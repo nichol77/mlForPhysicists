@@ -5,9 +5,9 @@
 #       extension: .py
 #       format_name: light
 #       format_version: '1.5'
-#       jupytext_version: 1.7.1
+#       jupytext_version: 1.14.4
 #   kernelspec:
-#     display_name: Python 3
+#     display_name: Python 3 (ipykernel)
 #     language: python
 #     name: python3
 # ---
@@ -53,43 +53,79 @@ mpl.rcParams['figure.dpi']=150 # dots per inch
 #Actually plot something
 fig, ax = plt.subplots()  #I like to make plots using this silly fig,ax method but plot how you like
 x=np.linspace(-10,10,100)  #Get 100 points from -10 to 10
+
+# At this point you might want to pause to reacquaint yourself with numpy arrays
+# What does np.linspace(-10,10,100) actually mean? What is the np part? Why is there a fullstop between np and linspace? What does the function return?
+# What would you expect to see if you ran the following lines of code?
+#print(x.shape)
+#print(x[1]-x[0])  #This one is easy to get wrong
+#print(x)
+
+# Now that you remember about what kind of thing x is here, what is the following code doing?
+# Why do we call np.exp(-x) rather than math.exp(-x) ?
 ax.plot(x,1./(1.+np.exp(-x)),linewidth=3) #Plot x vs Sigmoid with a linewidth of 3
-ax.set_xlabel("x")
-ax.set_ylabel("f(x)")
-ax.set_title("Sigmoid")
+ax.set_xlabel("x")  # Set the x label to x
+ax.set_ylabel("f(x)") # Set the y label to f(x)
+ax.set_title("Sigmoid") # Set the title to "Sigmoid"
 # -
 
 # Another very popular (perhaps the most popular) activation is the very impressively named "Rectified Linear Unit" or ReLU. It is a piecewise linear function function with two pieces, one of which is zero.
 
+# +
 #Plot the ReLU
 fig, ax = plt.subplots()  #I like to make plots using this silly fig,ax method but plot how you like
 x=np.linspace(-10,10,100)  #Get 100 points from -10 to 10
-ax.plot(x,x*(x>0),linewidth=3)  #Plot x vs ReLU with a linewidth of 5
-ax.set_xlabel("x")
-ax.set_title("ReLU")
-ax.set_ylabel("f(x)")
 
+# Here is another point where you might want to stop and thing for a minute or two
+# What does (x>0) return?
+# print(x>0)
+# So what happens when we do x*(x>0) ?
+ax.plot(x,x*(x>0),linewidth=3)  #Plot x vs ReLU with a linewidth of 5
+ax.set_xlabel("x") # Set the x label to x
+ax.set_title("ReLU") # Set the title to "ReLU" 
+ax.set_ylabel("f(x)") # Set the y label to f(x)
+
+# -
 
 #Plot the hyperbolic tangent
 fig, ax = plt.subplots()  #I like to make plots using this silly fig,ax method but plot how you like
 x=np.linspace(-10,10,100)  #Get 100 points from -10 to 10
 ax.plot(x,(np.exp(x)-np.exp(-x))/(np.exp(x)+np.exp(-x)),linewidth=3) #Plot x vs Sigmoid with a linewidth of 3
-ax.set_xlabel("x")
-ax.set_ylabel("f(x)")
-ax.set_title("Tanh")
+ax.set_xlabel("x") # Set the x label to x
+ax.set_ylabel("f(x)") # Set the y label to f(x)
+ax.set_title("Tanh") # Set the title to "Tanh" 
 
 # ## Our first neural network
 # So now we will make our very first neural network it will consist of just an input layer and output layer with no hidden layers.
+#
+# At first we are going to have a neural network that takes an input consisting of 4 nodes and produces an output consisting of 3 nodes. We can write this as matrix calculation where we will call the input $x$ and the result of the matrix calculation $z$. Our weights and biases will be $w$ and $b$.
+# $$ x = \begin{pmatrix} x_0 \\ x_1 \\x_2 \\x_3 \end{pmatrix} $$
+# $$ z = \begin{pmatrix} z_0 \\ z_1 \\z_2 \end{pmatrix} $$
+# $$ b = \begin{pmatrix} b_0 \\ b_1 \\b_2 \end{pmatrix} $$
+# $$ w = \begin{pmatrix} w_{00} & w_{01} & w_{02} & w_{03} \\ w_{10} & w_{11} & w_{12} & w_{13} \\ w_{10} & w_{11} & w_{12} & w_{13} \end{pmatrix} $$
+#
+# So as a matrix equation we could write:
+# $$ z = w \cdot x + b$$
+#
+# Or explicitly
+# $$ z = \begin{pmatrix} z_0 \\ z_1 \\z_2 \end{pmatrix} = 
+# \begin{pmatrix} w_{00} x_0 + w_{01}x_1 + w_{02} x_2 + w_{03} x_3 +b_0  \\ 
+# w_{10} x_0 + w_{11}x_1 + w_{12} x_2 + w_{13} x_3 +b_1  \\
+# w_{20} x_0 + w_{21}x_1 + w_{22} x_2 + w_{23} x_3 +b_2  \end{pmatrix} $$
+#
+# The actual output of the network will be after the activation function $f(z)$, so the output $y$ is
+# $$ y = f(z) = \begin{pmatrix} f(z_0) \\ f(z_1) \\ f(z_2) \end{pmatrix} $$
+#
 
 # +
 Nin=4 #Number of input nodes
 Nout=3 #Number of output nodes
 
-wMax=10
-bMax=1
+wMax=10 #Maximum value of the random weights
+bMax=1 #Maximum value of the random buasses
 #Initialize the weights and biases with random numbers
-w=np.random.uniform(low=-1*wMax,high=wMax,size=(Nout,Nin))
-b=np.random.uniform(low=-1*bMax,high=bMax,size=(Nout))
+w=np.random.uniform(low=-1*wMax,high=wMax,size=(Nout,Nin)) #Generate Nout*Nin random numbers from -wMax to +wMax
+b=np.random.uniform(low=-1*bMax,high=bMax,size=(Nout)) #Generate Nout random numbers from -bMax to bMax
 
 print("b=",b)  #Print bias vector
 print("w=",w) #Print weight matrix
@@ -262,6 +298,7 @@ print("z:",z)
 #Okay so three samples in parallel is not very impressive lets try a bigger number
 Nparallel=10000
 x=np.random.rand(Nparallel,2) #An array of 10000,2 random numbers
+print("x.shape",x.shape)
 print(x[0])
 z=evaluate_network_parallel(x) #Evaluate the network on all 10000 input pairs
 print(z[0])
@@ -290,7 +327,7 @@ ax[1].xaxis.set_ticks_position('bottom') #Move the x-axis to the bottom (persona
 x1flat=x1v.flatten()  #Flatten the 50x50 2-D array into a 2500 element 1d array
 x2flat=x2v.flatten()
 Nparallel=np.shape(x1flat)[0]  #This is a numpy way of getting the length of the first dimension of an array
-print(np.shape(x1flat))  #Just calling np.shape returns a tuple
+print("np.shape(x1flat)",np.shape(x1flat))  #Just calling np.shape returns a tuple
 print("Nparallel:",Nparallel) #But the first element of that tuple is the length
 xTest=np.zeros((Nparallel,2)) # Now need to create the input, which will need to have a shape which is (2500,2)
 xTest[:,0]=x1flat # fill first component (index 0)

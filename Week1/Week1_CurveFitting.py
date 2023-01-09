@@ -5,9 +5,9 @@
 #       extension: .py
 #       format_name: light
 #       format_version: '1.5'
-#       jupytext_version: 1.7.1
+#       jupytext_version: 1.14.4
 #   kernelspec:
-#     display_name: Python 3
+#     display_name: Python 3 (ipykernel)
 #     language: python
 #     name: python3
 # ---
@@ -101,84 +101,162 @@ mpl.rcParams['figure.dpi']=200 # dots per inch
 
 # +
 def f(x,theta):
+    """
+    This is a function which calculates
+        .. math::
+            f(x,\theta_1,\theta_2) = \frac {\theta_1}{\left(\theta_2-x\right)^2 +1} 
+    Args:
+        x: A numpy array of x values
+        theta: a list of [theta1,theta2]
+
+    Returns:
+        A numpy array of f(x,theta)
+    """
     return (theta[0])/(((theta[1]-x)**2)+1.0)
     
 
 def grad_f(x,theta):
+    """
+    This is a function which calculates
+        .. math::
+            \frac{\partial f}{\partial \theta_1} = \frac {1}{\left(\theta_2-x\right)^2 +1}
+            \frac{\partial f}{\partial \theta_2} = \frac {2\left(x-\theta_2\right)\theta_1}{\left(\left(\theta_2-x\right)^2 +1\right)^2}
+            
+    Args:
+        x: A numpy array of x values
+        theta: a list of [theta1,theta2]
+
+    Returns:
+        A 2D numpy array of [df/dtheta1(x,theta),df/dtheta2]
+    """
     return np.array([1/((theta[1]-x)**2 +1.0),  2*(x-theta[1])*theta[0]/((theta[1]-x)**2+1.0)**2])
    
 
 def true_f(x):
+    """
+    This is a function which calls f(x,theta) with theta=[2,0.5]
+    Args:
+        x: A numpy array of x values
+
+    Returns:
+        A numpy array of f(x,[2,0.5])
+    """
     return f(x,[2.0,0.5])
 
 # Get randomly sampled x values
 def samples(nsamples,width=2.0):
+    """
+    Returns an array of random numbers from 
+    Args:
+        nsamples: The length of the random samples array
+
+    Returns:
+        A numpy array of f(x,[2,0.5])
+    """
     return(width*np.random.randn(nsamples))
 
 def get_avg_fake_chisq(x, theta):
+    """
+    Returns the average fake chi-squared
+        .. math::
+            \chi^2 (x,\theta) = \frac{\sum_i=1^N \left(f(x,\theta) - f(2,0.5) \right)^2}{N}  
+    Args:
+        x: A numpy array of x values
+        theta: a list of [theta1,theta2]
+
+    Returns:
+        A single number the fake chisquared (it is fake because we have set sigma to 1)
+    """
     return np.average((f(x,theta)-true_f(x))**2)
 
 def get_2d_chisquared(theta0Vals,theta1Vals,numSamples):
-    N0=len(theta0Vals)
-    N1=len(theta1Vals)
-    output=np.zeros((N0,N1))
-    for j0 in range(N0):
-        for j1 in range(N1):
-            theta=np.array([theta0Vals[j0],theta1Vals[j1]])
-            x=samples(numSamples)
-            output[j0,j1]=get_avg_fake_chisq(x,theta)
+    """
+    Returns a 2D array of fake chisquared values
+    Args:
+        theta0Vals: An array of the theta0 values
+        theta1Vals: An array of the theta1 values
+        numSamples: Number of random samples to take at each point
+
+    Returns:
+        A 2d array of fake_chisqaured evaluated at each pair of theta values
+    """
+    N0=len(theta0Vals)  # Length of theta0Vals array
+    N1=len(theta1Vals)  # Length of theta1Vals array
+    output=np.zeros((N0,N1)) # 2D array for output values
+    for j0 in range(N0): # Loop over theta0 indices
+        for j1 in range(N1): # Loop over theta1 indices
+            theta=np.array([theta0Vals[j0],theta1Vals[j1]])  # Temp theta array
+            x=samples(numSamples) # Get numSamples random numbers
+            output[j0,j1]=get_avg_fake_chisq(x,theta) # Calculate the fake chisquared
     return(output)
 
 
 
 # -
 
-fig, ax = plt.subplots()  #I like to make plots using this silly fig,ax method but plot how you like
+#Just to remind ourselves of what shape the numpy arrays are
 x=np.linspace(-10,10,100)  #Get 100 points from -10 to 10
+print("x.shape",x.shape)
+print("f.shape",f(x,[1,-3]).shape)
+print("grad_f.shape",grad_f(x,[1,-3]).shape)
+
+#Here we will plot our true function with theta=[2,0.5] and one with theta=[1,-3]
+fig, ax = plt.subplots()  #I like to make plots using this silly fig,ax method but plot how you like
 ax.plot(x,true_f(x),linewidth=3,label=r"True $f(\theta=[2,0.5])$")
 ax.plot(x,f(x,[1,-3]),linewidth=3,label=r'$f(\theta=[1,-3])$')
 ax.set_xlabel("x")
 ax.set_ylabel("f(x)")
 ax.legend()
 
-theta0Vals=np.linspace(-4,4,50)
-theta1Vals=np.linspace(-3,3,50)
-chi2=get_2d_chisquared(theta0Vals,theta1Vals,10000)
-X,Y=np.meshgrid(theta0Vals,theta1Vals,indexing='ij')
-nlevels=20
-fig, ax = plt.subplots() #Get the fig and ax objects for the plot 
-ax.contourf(X,Y,chi2,nlevels)
-ax.contour(X,Y,chi2,nlevels,colors="white")
-ax.set_xlabel(r"$\theta_0$")
-ax.set_ylabel(r"$\theta_1$")
+# ## Plot the likelihood (fake chisquared) surface
+# In this section we will plot what the chisquared surface in $\theta_0$ vs $\theta_1$ space
 
+# Now we are going to get a 2D map of our (fake) chisquared over a range of theta0,theta1 space  
+theta0Vals=np.linspace(-4,4,50) #Get 50 theta0 values from -4 to +4
+theta1Vals=np.linspace(-3,3,50) #Get 50 theta1 values from -3 to +3
+chi2=get_2d_chisquared(theta0Vals,theta1Vals,10000) #Generate the fake chi-squared map with 10000 random samples per point
+X,Y=np.meshgrid(theta0Vals,theta1Vals,indexing='ij') # X,Y are both
+nlevels=20 # Number of levels (white lines on plots) we will use for the contour plot
+fig, ax = plt.subplots() #Get the fig and ax objects for the plot 
+ax.contourf(X,Y,chi2,nlevels) #Plot filled contours (colour map below)
+ax.contour(X,Y,chi2,nlevels,colors="white") #Plot line contours (white lines below)
+ax.set_xlabel(r"$\theta_0$") #Label the axis
+ax.set_ylabel(r"$\theta_1$") #Label the axis
+
+
+# ## Stochastic gradient descent
+# Now we will try and implement a stochastic gradient descent algorithm
 
 # +
-numSteps=150 #Number of steps for minimisation
-theta=[-3,0.5] #Start place
-eta=0.1 #'Learning' rate
+numSteps=150 #Number of steps in our stochastic gradient descent algorithm
+theta=[-3,0.5] #Starting place, you can change this and see what happens
+eta=0.1 #'Learning' rate, how far do we step each time
 chiSqArray=np.zeros(numSteps)  #Array for plotting
 thetaArray=np.zeros((numSteps+1,2))  #Array for plotting 
-thetaArray[0]=theta
+thetaArray[0]=theta #Starting step
 
-for i in range(numSteps):
-    x=samples(10)
-    chiSq=get_avg_fake_chisq(x,theta)
-    chiSqArray[i]=chiSq #For
+
+for i in range(numSteps): #Loop over i from 0 to numSteps-1
+    x=samples(10) # Generate 10 random samples... change this number to see what happens
+    chiSq=get_avg_fake_chisq(x,theta)  #Get chisquared for these fake samples
+    chiSqArray[i]=chiSq #For plotting
     #Work out difference to true function
     deviation=f(x,theta)-true_f(x)
     #Now work out where do go next
     theta-=eta*np.average(deviation[None,:]*grad_f(x,theta),axis=1)
-    thetaArray[i+1]=theta
+    thetaArray[i+1]=theta  #For plotting
     
 # -
 
+# First plot is going to be step number vs chisquared
 fig, ax = plt.subplots()  #I like to make plots using this silly fig,ax method but plot how you like
-count=np.arange(numSteps+1)  
+count=np.arange(numSteps+1)  #The integers from 0 up to num steps
 ax.plot(count[:-1],chiSqArray,linewidth=3)
 ax.set_xlabel("Step Number")
 ax.set_ylabel(r"(Fake) $\chi^2$")
 
+# Now we are going to get a 2D map of our (fake) chisquared over a range of theta0,theta1 space  
+# And overlay the steps taken by the stochastic gradient descent algorithm
 fig, ax = plt.subplots() #Get the fig and ax objects for the plot 
 ax.contourf(X,Y,chi2,nlevels)
 ax.contour(X,Y,chi2,nlevels,colors="white")
