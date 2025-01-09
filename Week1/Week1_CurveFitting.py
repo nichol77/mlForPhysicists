@@ -18,6 +18,7 @@
 # - Brief reminder of terminology 
 # - Maximum likelihood
 # - $\chi^2$ test and Gaussian distribution
+# - Mean squared error
 # - Parameter estimation
 #
 
@@ -46,12 +47,25 @@
 
 # ## $\chi^2$ test
 #
-# One interesting feature of our discussion of the log-likelihood of the Gaussian distributed data is that it naturally introduced the $\chi^2$ test statistic, which is effectively what we minimised above
+# One interesting feature of our discussion of the log-likelihood of the Gaussian distributed data is that it naturally introduced the $\chi^2$ test statistic, which is effectively what we minimised above (when we maximised the likelihood)
 # $$ -2 \ln L \propto \chi^2 = \sum_i \left(\frac{x_{i}-\mu}{\sigma}\right)^2$$
 #
 # The close connections between the $\chi^2$ test and the Gaussian log-likelihood unfortunately does tend to lead to a certain amount of sloppiness regarding language and often we will talk about likelihoods which aren't quite mathematically defined as such. Of course in the field of machine learning much of this confusion is washed away by the use of an entirely different set of jargon (e.g. cost functions).
 #
 # The $\chi^2$ test is very similar to the least squares minimisation but due to its connection with the Gaussian probability distribution it has a number of interesting properties that we don't have the time or inclination to dwell on here. They are covered in detail in the fourth year statistical data analysis course.
+#
+# ## Mean squared error
+#
+# One quantity that is closely related to the $\chi^2$ is the mean squared error. One advantage of the mean squared error is that it can be calculated even when the value $\sigma$ is unknown or when the data is not distributed according to the Gaussian dsitribution. The mean sqaured error, $\textrm{MSE}$ is defind as:
+# $$ \textrm{MSE} = \frac{1}{N} \sum_i^N \left( f(x_i;\theta) - \tilde{f} \right)^2 $$
+# where $\tilde{f}$ is the true distribution that we are trying to describe with $f(x_i;\theta)$.
+#
+# ## Total sqaured error
+#
+# Sometimes it wis more convenient to work with the total sqaured error, TSE:
+# $$ \textrm{TSE} = \sum_i^N \left( f(x_i;\theta) - \tilde{f} \right)^2 $$
+# which of course is just $N$ times the mean squared error.
+#
 #
 #
 
@@ -155,30 +169,30 @@ def samples(nsamples,width=2.0):
     """
     return(width*np.random.randn(nsamples))
 
-def get_avg_fake_chisq(x, theta):
+def get_mean_squared_error(x, theta):
     """
-    Returns the average fake chi-squared
+    Returns the mean squared error
         .. math::
-            \chi^2 (x,\theta) = \frac{\sum_i=1^N \left(f(x,\theta) - f(2,0.5) \right)^2}{N}  
+            MSE (x,\theta) = \frac{\sum_i=1^N \left(f(x,\theta) - f(2,0.5) \right)^2}{N}  
     Args:
         x: A numpy array of x values
         theta: a list of [theta1,theta2]
 
     Returns:
-        A single number the fake chisquared (it is fake because we have set sigma to 1)
+        A single number the mean squared error 
     """
     return np.average((f(x,theta)-true_f(x))**2)
 
-def get_2d_chisquared(theta0Vals,theta1Vals,numSamples):
+def get_2d_mean_squared_error(theta0Vals,theta1Vals,numSamples):
     """
-    Returns a 2D array of fake chisquared values
+    Returns a 2D array of mean squared error values
     Args:
         theta0Vals: An array of the theta0 values
         theta1Vals: An array of the theta1 values
         numSamples: Number of random samples to take at each point
 
     Returns:
-        A 2d array of fake_chisqaured evaluated at each pair of theta values
+        A 2d array of mean squared error values evaluated at each pair of theta values
     """
     N0=len(theta0Vals)  # Length of theta0Vals array
     N1=len(theta1Vals)  # Length of theta1Vals array
@@ -187,7 +201,7 @@ def get_2d_chisquared(theta0Vals,theta1Vals,numSamples):
         for j1 in range(N1): # Loop over theta1 indices
             theta=np.array([theta0Vals[j0],theta1Vals[j1]])  # Temp theta array
             x=samples(numSamples) # Get numSamples random numbers
-            output[j0,j1]=get_avg_fake_chisq(x,theta) # Calculate the fake chisquared
+            output[j0,j1]=get_mean_squared_error(x,theta) # Calculate the mean_squared_error
     return(output)
 
 
@@ -208,13 +222,15 @@ ax.set_xlabel("x")
 ax.set_ylabel("f(x)")
 ax.legend()
 
-# ## Plot the likelihood (fake chisquared) surface
-# In this section we will plot what the chisquared surface in $\theta_0$ vs $\theta_1$ space
+# ## Plot the likelihood (mean squared error) surface
+# In this section we will plot what the mean squared error surface in $\theta_0$ vs $\theta_1$ space. 
+#
+# Remember we are plotting the mean squared error because we it is simple to calculate and will be related to the likelihood. Sometimes we are lazy and we call it the likelihood surface or chi-squared surface, but strictly speaking that isn't true.
 
-# Now we are going to get a 2D map of our (fake) chisquared over a range of theta0,theta1 space  
+# Now we are going to get a 2D map of our mean squared error over a range of theta0,theta1 space  
 theta0Vals=np.linspace(-4,4,50) #Get 50 theta0 values from -4 to +4
 theta1Vals=np.linspace(-3,3,50) #Get 50 theta1 values from -3 to +3
-chi2=get_2d_chisquared(theta0Vals,theta1Vals,10000) #Generate the fake chi-squared map with 10000 random samples per point
+chi2=get_2d_mean_squared_error(theta0Vals,theta1Vals,10000) #Generate the mean squared error map with 10000 random samples per point
 X,Y=np.meshgrid(theta0Vals,theta1Vals,indexing='ij') # X,Y are both
 nlevels=20 # Number of levels (white lines on plots) we will use for the contour plot
 fig, ax = plt.subplots() #Get the fig and ax objects for the plot 
@@ -238,7 +254,7 @@ thetaArray[0]=theta #Starting step
 
 for i in range(numSteps): #Loop over i from 0 to numSteps-1
     x=samples(10) # Generate 10 random samples... change this number to see what happens
-    chiSq=get_avg_fake_chisq(x,theta)  #Get chisquared for these fake samples
+    chiSq=get_mean_squared_error(x,theta)  #Get the mean squared error for these samples
     chiSqArray[i]=chiSq #For plotting
     #Work out difference to true function
     deviation=f(x,theta)-true_f(x)
@@ -248,14 +264,14 @@ for i in range(numSteps): #Loop over i from 0 to numSteps-1
     
 # -
 
-# First plot is going to be step number vs chisquared
+# First plot is going to be step number vs mean_squared_error
 fig, ax = plt.subplots()  #I like to make plots using this silly fig,ax method but plot how you like
 count=np.arange(numSteps+1)  #The integers from 0 up to num steps
 ax.plot(count[:-1],chiSqArray,linewidth=3)
 ax.set_xlabel("Step Number")
-ax.set_ylabel(r"(Fake) $\chi^2$")
+ax.set_ylabel(r"Mean Squared Error")
 
-# Now we are going to get a 2D map of our (fake) chisquared over a range of theta0,theta1 space  
+# Now we are going to get a 2D map of our mean_squared_error over a range of theta0,theta1 space  
 # And overlay the steps taken by the stochastic gradient descent algorithm
 fig, ax = plt.subplots() #Get the fig and ax objects for the plot 
 ax.contourf(X,Y,chi2,nlevels)
