@@ -247,15 +247,15 @@ ax.set_ylabel(r"$\theta_1$") #Label the axis
 numSteps=150 #Number of steps in our stochastic gradient descent algorithm
 theta=[-3,0.5] #Starting place, you can change this and see what happens
 eta=0.1 #'Learning' rate, how far do we step each time
-chiSqArray=np.zeros(numSteps)  #Array for plotting
+mseArray=np.zeros(numSteps)  #Array for plotting
 thetaArray=np.zeros((numSteps+1,2))  #Array for plotting 
 thetaArray[0]=theta #Starting step
 
 
 for i in range(numSteps): #Loop over i from 0 to numSteps-1
     x=samples(10) # Generate 10 random samples... change this number to see what happens
-    chiSq=get_mean_squared_error(x,theta)  #Get the mean squared error for these samples
-    chiSqArray[i]=chiSq #For plotting
+    mse=get_mean_squared_error(x,theta)  #Get the mean squared error for these samples
+    mseArray[i]=mse #For plotting
     #Work out difference to true function
     deviation=f(x,theta)-true_f(x)
     #Now work out where do go next
@@ -267,7 +267,7 @@ for i in range(numSteps): #Loop over i from 0 to numSteps-1
 # First plot is going to be step number vs mean_squared_error
 fig, ax = plt.subplots()  #I like to make plots using this silly fig,ax method but plot how you like
 count=np.arange(numSteps+1)  #The integers from 0 up to num steps
-ax.plot(count[:-1],chiSqArray,linewidth=3)
+ax.plot(count[:-1],mseArray,linewidth=3)
 ax.set_xlabel("Step Number")
 ax.set_ylabel(r"Mean Squared Error")
 
@@ -291,5 +291,14 @@ ax.quiver(thetaArray[:-1,0], thetaArray[:-1,1], thetaArray[1:,0]-thetaArray[:-1,
 # - What about this function? $$\frac{\sin(\theta_1 (x-\theta_0))}{5+x^2}$$
 #
 #
+
+# +
+values = np.linspace(0,1,20)
+diff=values[1]-values[0]
+print(f"diff: {diff:.4f}")
+#print(values[1]-values[0])
+
+
+# -
 
 
