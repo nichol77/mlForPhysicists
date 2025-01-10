@@ -292,13 +292,7 @@ ax.quiver(thetaArray[:-1,0], thetaArray[:-1,1], thetaArray[1:,0]-thetaArray[:-1,
 #
 #
 
-# +
-values = np.linspace(0,1,20)
-diff=values[1]-values[0]
-print(f"diff: {diff:.4f}")
-#print(values[1]-values[0])
 
 
-# -
 
 
