@@ -5,9 +5,9 @@
 #       extension: .py
 #       format_name: light
 #       format_version: '1.5'
-#       jupytext_version: 1.6.0
+#       jupytext_version: 1.14.4
 #   kernelspec:
-#     display_name: Python 3
+#     display_name: Python 3 (ipykernel)
 #     language: python
 #     name: python3
 # ---
@@ -141,7 +141,7 @@ class SimpleNN:
 
 # + tags=[]
 #Need to load our image, either from the URL 
-input_img = imageio.imread('http://www.hep.ucl.ac.uk/undergrad/0056/other/Smiley.png')
+input_img = imageio.v2.imread('http://www.hep.ucl.ac.uk/undergrad/0056/other/Smiley.png')
 #or download it and read from the local directory
 #input_img = imageio.imread('Smiley.png')
 pixel_image=np.transpose(input_img[:,:,0]) # have to transpose...

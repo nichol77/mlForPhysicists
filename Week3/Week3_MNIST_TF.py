@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # ---
 # jupyter:
 #   jupytext:
@@ -6,9 +5,9 @@
 #       extension: .py
 #       format_name: light
 #       format_version: '1.5'
-#       jupytext_version: 1.6.0
+#       jupytext_version: 1.14.4
 #   kernelspec:
-#     display_name: Python 3
+#     display_name: Python 3 (ipykernel)
 #     language: python
 #     name: python3
 # ---
@@ -101,7 +100,8 @@ display_image_array(whichImg)
 # A neural network is made up of layers and in the simple case these layers are applied sequentially.
 
 model = keras.Sequential([
-    keras.layers.Flatten(input_shape=(28,28)),
+    keras.layers.Input(shape=(28,28)),
+    keras.layers.Flatten(),
     keras.layers.Dense(128,activation='relu'),
     keras.layers.Dense(10)
 ])
@@ -118,7 +118,7 @@ model = keras.Sequential([
 # - *Optimiser* - This is how the model gets updated based on the data and the loss function
 # - *Metrics* - Used to monitor the training and testing steps. The following example uses *accuracy*, the fraction of the images that are correctly classified.
 
-model.compile(loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True), optimizer=tf.keras.optimizers.SGD(lr=1.0),
+model.compile(loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True), optimizer=tf.keras.optimizers.SGD(learning_rate=1.0),
               metrics=['accuracy'])
 
 # ## Train the model
@@ -220,6 +220,7 @@ test_images=test_images/255.0
 (train_images,train_labels)=(train_images[:50000],train_labels[:50000])
 print(np.shape(valid_images))
 print(np.shape(train_images))
+print(np.shape(train_labels))
 print(np.shape(test_images))
 
 # +
@@ -230,7 +231,7 @@ model = keras.Sequential([
     keras.layers.Dense(10)
 ])
 
-model.compile(loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True), optimizer=tf.keras.optimizers.SGD(lr=1.0),
+model.compile(loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True), optimizer=tf.keras.optimizers.SGD(learning_rate=1.0),
               metrics=['accuracy'])
 # -
 
