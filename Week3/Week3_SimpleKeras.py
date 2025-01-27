@@ -37,30 +37,55 @@ mpl.rcParams["legend.frameon"] = False
 mpl.rcParams['figure.dpi']=200 # dots per inch
 
 print("tf.__version__",tf.__version__)
+
 # -
 
-# ### Define our network
-# We will define a network with one input and one output and two hidden layers.
+# ### Define our first two networks
+# Below we show two example neural network, the first is defined using the Keras Sequential API (easy) and the second uses the Functional API (more flexibile)
+#
+# The sequential network will have one input neuron and one output neuron and two hidden layers.
 # - First hidden layer has 1 input and 20 neurons with sigmoid activation functions
 # - Second hidden layer takes 20 inputs (from the first hidden layer) and has 10 neurons with sigmoid activation functions.
 # - Output layer is a single neuron with linear activation function.
+#
+#
+# The functional network will have one input neuron and one output neuron and two hidden layers.
+# - First hidden layer has 1 input and 20 neurons with ReLU activation functions
+# - Second hidden layer takes 20 inputs (from the first hidden layer) and has 10 neurons with ReLU activation functions.
+# - Output layer is a single neuron with linear activation function.
 
-model = keras.Sequential([
-    keras.layers.Dense(20,input_shape=(1,),activation="sigmoid"),
+# +
+#This first example creates a model using the Sequential API where each layer is defined sequentially
+model1 = keras.Sequential([
+    keras.layers.Input(shape=(1,)),
+    keras.layers.Dense(20,activation="sigmoid"),
     keras.layers.Dense(10,activation='sigmoid'),
     keras.layers.Dense(1,activation='linear')
 ])
 
+## Altenratively we can use the functional API where one has to code the dependence between layers explictly
+# In most situations in this course the Sequential API is easier to use, but the functional API offers much more freedom
+input_layer =  keras.layers.Input(shape=(1,))
+Layer_1 = keras.layers.Dense(20, activation="relu")(input_layer)
+Layer_2 = keras.layers.Dense(10, activation="relu")(Layer_1)
+output_layer= keras.layers.Dense(1, activation="linear")(Layer_2)
+##Defining the model by specifying the input and output layers
+model2 = keras.models.Model(inputs=input_layer, outputs=output_layer)
+
+# -
+
 # Having defined our network the next step is to compile it, specifing which loss function and which optimiser we want to use. Here we will use the 'adam' optimiser which is adaptive and much more perfromant than the standard gradient descent algorithm.
 
-model.compile(loss='mean_squared_error',optimizer='adam')
+model1.compile(loss='mean_squared_error',optimizer='adam')
+model2.compile(loss='mean_squared_error',optimizer='adam')
 
 # ### Now let's look at our network
 # There are lots of built in functions to understand the network structure here we will look at a couple.
 # ` model.summary()` - This prints a string summary of the network.
 #
 
-model.summary()
+model1.summary()
+model2.summary()
 
 
 # There are a few things to note here:
@@ -71,7 +96,7 @@ model.summary()
 # If you have some extra packages installed (pydot + graphviz) you can also get a pretty plot of the network using the `kera.util.plot_model` function
 
 # +
-#keras.utils.plot_model(model,show_shapes=True)
+#keras.utils.plot_model(model1,show_shapes=True)
 # -
 
 # Now lets define our target function
@@ -88,38 +113,64 @@ def target_func(y):
 nbatch = 2000  #Number of batches
 batchsize = 100 #Samples per batch
 costs=np.zeros(nbatch) #Output array for the costs
+costs2=np.zeros(nbatch) #Output array for the costs
 
 #Loop over the batches, get batchsize samples and train the network
 for i in range(nbatch):
-    x=np.random.uniform(low=-10.0,high=+10.0,size=[batchsize,1]) #Generate batchsize random numbers
+    x=np.random.uniform(low=-10.0,high=+10.0,size=[batchsize,1]) #Generate batchsize random numbers between -10 and +10
     y=target_func(x) #Evaluate the function for each random number
-    costs[i]=model.train_on_batch(x,y)  #Train the model on this batch of data
+    costs[i]=model1.train_on_batch(x,y)  #Train the model on this batch of data
+    costs2[i]=model2.train_on_batch(x,y)  #Train the model on this batch of data
                         
 # -
 
 #Here we plot the cost vs batch number 
 fig, ax = plt.subplots()  #I like to make plots using this silly fig,ax method but plot how you like
-step=np.arange(nbatch)  
-ax.plot(step,costs,linewidth=3)
+step=np.arange(nbatch)  # This function gets a range of numbers from 0 up to nbatch-1
+ax.plot(step,costs,linewidth=3,label='Model 1',alpha=0.5)
+ax.plot(step,costs2,linewidth=3,label='Model 2',alpha=0.5)
 ax.set_xlabel("Batch Number")
 ax.set_ylabel("Cost")
+ax.legend()
+ax.set_yscale('log')
 
 # +
 # get the output on a 1D grid of points:
 N=400 # number of points
 y_in=np.zeros([N,1]) # prepare correct shape for network, here N becomes the batch size
 y_in[:,0]=np.linspace(-20.0,20.0,N) # fill with interval
-y_out=model.predict_on_batch(y_in) # apply the network to this set of points!
+y_out=model1.predict_on_batch(y_in) # apply the network to this set of points!
+y_out2=model2.predict_on_batch(y_in) # apply the network to this set of points!
 
 # plot it!
 fig, ax = plt.subplots() 
-ax.plot(y_in,y_out,label="NN")
-ax.plot(y_in,target_func(y_in),color="orange",label="true")
+ax.plot(y_in,y_out,label="Model 1")
+ax.plot(y_in,y_out2,label="Model 2")
+ax.plot(y_in,target_func(y_in),label="Target")
 ax.set_xlabel("x")
 ax.set_ylabel("y")
+ax.set_xlim([-20,20])
+ax.axvspan(-20,-10,facecolor='lightgrey', alpha=0.5)
+ax.axvspan(+10,+20,facecolor='lightgrey', alpha=0.5)
+ax.legend()
+
+
+fig, ax = plt.subplots() 
+ax.plot(y_in,y_out-target_func(y_in),label="Model 1")
+ax.plot(y_in,y_out2-target_func(y_in),label="Model 2")
+ax.set_xlabel("x")
+ax.set_ylabel("Network - Target")
+ax.set_title("Residual")
+ax.set_xlim([-20,20])
+ax.axvspan(-20,-10,facecolor='lightgrey', alpha=0.5)
+ax.axvspan(+10,+20,facecolor='lightgrey', alpha=0.5)
 ax.legend()
 # -
 
+# ## Discussion
+#
+# The main difference between these two models is the actuvation function. Model 1 uses sigmoid and has a smooth curve. Model 2 uses ReLU and has some sharp features in the network output. For low numbers of training batches it isn't obvious that the performance of the network outside of the region it was trained on (-10,10) is worse, but if you increase the number of batches this will become apparent.
+#
 # ## Further work
 #
 # ### Exercise 1: Make a better network?
