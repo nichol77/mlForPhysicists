@@ -5,9 +5,9 @@
 #       extension: .py
 #       format_name: light
 #       format_version: '1.5'
-#       jupytext_version: 1.7.1
+#       jupytext_version: 1.14.4
 #   kernelspec:
-#     display_name: Python 3
+#     display_name: Python 3 (ipykernel)
 #     language: python
 #     name: python3
 # ---
@@ -43,6 +43,11 @@ from tensorflow import keras
 # ## How many sunspots?
 # Here is an example of getting a dataset of the tabulated mean number of sunsports from 1749 to now. The data comes from the [Sunspot Index and Long-term Solar Observations webpae.](http://sidc.be/silso/home) The `snmtotcsv.php` script returns a csv of the monthly mean number of sunspots (actually instead of a comma separated file the use the semi-colon to separate items). The file does not have a header row so we will have to manually label the columns.
 #
+
+# +
+#You might need to install pandas if so uncomment and run the following line.
+# #!pip install pandas
+# -
 
 import pandas as pd
 url='http://www.sidc.be/silso/INFO/snmtotcsv.php'
@@ -96,6 +101,16 @@ nn_df.head()
 # ### Creating, train, validation and testing data samples
 # We want to create training, validation and testing data samples from these rows. The input data needs to have the shape `(num_rows, num_time_seqs, num_features)`. For the sunspot data the `num_features` is just 1 and `num_time_seqs` is 6 in this example
 #
+#
+# #### scikit-learn
+# Another useful library is the scikit-learn library which you can install via pip
+
+
+
+# +
+#If necessary you can install scikit-learn with
+# #!pip install scikit-learn
+# -
 
 train_label=nn_df.label.values
 train_data=nn_df.drop('label',axis=1).values
@@ -118,7 +133,8 @@ print(train_data.shape)
 # ## Define our model
 
 model=keras.models.Sequential()
-model.add(keras.layers.LSTM(64,input_shape=(n_ts,1),return_sequences=True)) # LSTM layer with 50 neurons
+model.add(keras.layers.Input(shape=(n_ts,1)))
+model.add(keras.layers.LSTM(64,return_sequences=True)) # LSTM layer with 50 neurons
 model.add(keras.layers.LSTM(32,activation='relu'))
 model.add(keras.layers.Dense(32,activation='relu'))
 model.add(keras.layers.Dense(1,activation="linear"))

@@ -5,9 +5,9 @@
 #       extension: .py
 #       format_name: light
 #       format_version: '1.5'
-#       jupytext_version: 1.7.1
+#       jupytext_version: 1.14.4
 #   kernelspec:
-#     display_name: Python 3
+#     display_name: Python 3 (ipykernel)
 #     language: python
 #     name: python3
 # ---
@@ -53,10 +53,13 @@ print(tf.__version__)
 def init_recall_net(timesteps):
     #Make our new sequential network
     rnn = keras.models.Sequential()
+
+    #Add input layer
+    rnn.add(keras.layers.InputLayer(batch_input_shape=(None, timesteps, 3)))
     
     #Add two LSTM layers
     # note: batch_input_shape is (batchsize,timesteps,data_dim)
-    rnn.add(keras.layers.LSTM(5, batch_input_shape=(None, timesteps, 3), return_sequences=True))
+    rnn.add(keras.layers.LSTM(5, return_sequences=True))
     rnn.add(keras.layers.LSTM(2, return_sequences=True))
     
     #Compile the network
@@ -210,8 +213,10 @@ print("Deviation: ", sum((test_output-test_target[:,:,0])**2))
 def init_recall_net_powerful(timesteps):
     rnn = keras.models.Sequential()
     # note: batch_input_shape is (batchsize,timesteps,data_dim)
+    rnn.add(keras.layers.InputLayer(batch_input_shape=(None, timesteps, 3)))
+
     #Only difference is the number of LSTMs in the first layer
-    rnn.add(keras.layers.LSTM(20, batch_input_shape=(None, timesteps, 3), return_sequences=True))
+    rnn.add(keras.layers.LSTM(20, return_sequences=True))
     rnn.add(keras.layers.LSTM(2, return_sequences=True))
     rnn.compile(loss='mean_squared_error', optimizer='adam', metrics=['accuracy'])
     return rnn
@@ -281,7 +286,8 @@ def init_count_net(timesteps):
     global firstLSTMlayer
     rnn = keras.models.Sequential()
     # note: batch_input_shape is (batchsize,timesteps,data_dim)
-    firstLSTMlayer=keras.layers.LSTM(2, batch_input_shape=(None, timesteps, 2), return_sequences=True)
+    rnn.add(keras.layers.InputLayer(batch_input_shape=(None, timesteps, 2)))
+    firstLSTMlayer=keras.layers.LSTM(2, return_sequences=True)
     rnn.add(firstLSTMlayer)
     rnn.add(keras.layers.LSTM(2, return_sequences=True))
     rnn.compile(loss='mean_squared_error', optimizer='adam', metrics=['accuracy'])

@@ -5,9 +5,9 @@
 #       extension: .py
 #       format_name: light
 #       format_version: '1.5'
-#       jupytext_version: 1.7.1
+#       jupytext_version: 1.14.4
 #   kernelspec:
-#     display_name: Python 3
+#     display_name: Python 3 (ipykernel)
 #     language: python
 #     name: python3
 # ---
@@ -42,7 +42,8 @@ from tensorflow import keras
 
 #Define
 model=keras.models.Sequential()
-model.add(keras.layers.LSTM(20,input_shape=(None,1),return_sequences=False)) # LSTM layer with 50 neurons
+model.add(keras.layers.Input(shape=(None,1)))
+model.add(keras.layers.LSTM(20,return_sequences=False)) # LSTM layer with 50 neurons
 model.add(keras.layers.Dense(1,activation="linear"))
 model.compile(loss='mean_squared_error',optimizer='adam')
 model.summary()
