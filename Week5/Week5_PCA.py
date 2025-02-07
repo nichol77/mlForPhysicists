@@ -5,9 +5,9 @@
 #       extension: .py
 #       format_name: light
 #       format_version: '1.5'
-#       jupytext_version: 1.6.0
+#       jupytext_version: 1.14.4
 #   kernelspec:
-#     display_name: Python 3
+#     display_name: Python 3 (ipykernel)
 #     language: python
 #     name: python3
 # ---
@@ -75,6 +75,7 @@ train_images=train_images/255.0
 print("train_images.shape: ",np.shape(train_images))
 X=np.reshape(train_images,(60000,784))
 print("X.shape:",np.shape(X))
+
 mu=np.mean(X,axis=0)
 x=X-mu
 #rho=np.dot(np.transpose(x),x)  #Make the covaraince matrix by hand
