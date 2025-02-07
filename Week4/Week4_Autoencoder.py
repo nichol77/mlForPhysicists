@@ -5,9 +5,9 @@
 #       extension: .py
 #       format_name: light
 #       format_version: '1.5'
-#       jupytext_version: 1.6.0
+#       jupytext_version: 1.14.4
 #   kernelspec:
-#     display_name: Python 3
+#     display_name: Python 3 (ipykernel)
 #     language: python
 #     name: python3
 # ---
@@ -159,6 +159,8 @@ def get_layer_activations(network, y_in):
 # This example isn't even a real autoencoder because it never shrinks the dimensionality of the representation. So it should in theory be possible to train it to perfection.
 
 # +
+image_size=30
+
 # A simple image generator that returns an array of batchsize images
 # each image has a size of x * y pixels
 # in this image each image has a randomly placed circle (and the circle is of random size)
@@ -168,28 +170,29 @@ def my_generator(batchsize,x,y):
     y0=np.random.uniform(size=batchsize,low=-1,high=1)
     return( 1.0*((x[None,:,:]-x0[:,None,None])**2 + (y[None,:,:]-y0[:,None,None])**2 < R[:,None,None]**2) )
 
+input_shape=(image_size,image_size,1)
 #Now let's define a model to try and learn how to make these images
 model=keras.Sequential()
+input_layer=keras.layers.Input(shape=input_shape)
+model.add(input_layer)
 # 3x3 kernel size, 10 channels in first hidden layer:
-model.add(keras.layers.Conv2D(10,3,input_shape=(None,None,1),
-               activation="sigmoid",padding='same'))
+model.add(keras.layers.Conv2D(10,3,activation="sigmoid",padding='same'))
 # 3x3 kernel size, only 1 channel in last hidden layer:
 model.add(keras.layers.Conv2D(1,3,activation="linear",padding='same'))
 model.compile(loss='mean_squared_error',
               optimizer='adam')
 model.summary()
 
-
 # -
 
 #Just for fun let's plot what the image looks like before any training
 #Probably since our input image is just 1 or 0 the output even with random model weights and biases will
 #have a circle imprint
-plot_test_image(model,my_generator,50)
+plot_test_image(model,my_generator,image_size)
 
 #Now we can do the actual model training
 steps=100
-cost,_=generate_and_train(model,my_generator,img_size=50,batchsize=100,steps=steps)
+cost,_=generate_and_train(model,my_generator,img_size=image_size,batchsize=100,steps=steps)
 #Plot the cost
 fig, ax = plt.subplots()
 stepArray=np.arange(steps) 
@@ -198,19 +201,24 @@ ax.set_xlabel("Step Number")
 ax.set_ylabel("Cost")
 
 #And now when we look our model is probably doing a much better job of reproducing the image
-plot_test_image(model,my_generator,30)
+plot_test_image(model,my_generator,image_size)
 
 # ## But what is our network doing?
 # We can extract information from the layers in out neural network
 
+# +
 model.summary()
 layer_outputs = [layer.output for layer in model.layers[:1]] # Extracts the outputs of the hidden layer
-activation_model = keras.models.Model(inputs=model.input, outputs=layer_outputs) # Creates a model that will return these outputs, given the model input
+activation_model = keras.models.Model(inputs=model.inputs, outputs=layer_outputs) # Creates a model that will return these outputs, given the model input
+
+
+
+# -
 
 # ## Running the activation model in predict mode
 
 #Get random test image
-y_test=get_test_image(my_generator,30)
+y_test=get_test_image(my_generator,image_size)
 #Now use our activation_model on our test image
 activations = activation_model.predict(y_test) 
 print(activations.shape)
@@ -238,8 +246,8 @@ plt.subplots_adjust(left=0.05,
 
 model2=keras.models.Sequential()
 # 3x3 kernel size, 10 channels in first hidden layer:
-model2.add(keras.layers.Conv2D(4,5,input_shape=(None,None,1),
-               activation="sigmoid",padding='same'))
+model2.add(keras.layers.Input(shape=(None,None,1))) #Here we don't specify the image size
+model2.add(keras.layers.Conv2D(4,5,activation="sigmoid",padding='same'))
 model2.add(keras.layers.AveragePooling2D(pool_size=(3,3),padding='same')) # down
 model2.add(keras.layers.Conv2D(4,5,
                activation="sigmoid",padding='same'))
@@ -285,7 +293,7 @@ def plot_intermediate_layers(model,test_img,images_per_row=4):
     print(layer_names)
 
     layer_outputs = [layer.output for layer in model.layers[:]] # Extracts the outputs of the hidden layer
-    activation_model = keras.models.Model(inputs=model.input, outputs=layer_outputs) # Creates a model that will return these outputs, given the model input
+    activation_model = keras.models.Model(inputs=model.inputs, outputs=layer_outputs) # Creates a model that will return these outputs, given the model input
     activations = activation_model.predict(test_img) 
    
     for layer_name, layer_activation in zip(layer_names, activations): # Displays the feature maps
