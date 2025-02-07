@@ -7,7 +7,7 @@
 #       format_version: '1.5'
 #       jupytext_version: 1.14.4
 #   kernelspec:
-#     display_name: Python 3
+#     display_name: Python 3 (ipykernel)
 #     language: python
 #     name: python3
 # ---
@@ -41,7 +41,8 @@ mpl.rcParams['figure.dpi']=200 # dots per inch
 # ## Define our neural network
 
 model=keras.Sequential()  #Sequential is a standard layered neural network
-model.add(keras.layers.Dense(60,input_shape=(2,),activation='relu')) #Add a fully-connected (Dense) layer  of 60 nodes with 2 input nodes
+model.add(keras.layers.Input(shape=(2,)))
+model.add(keras.layers.Dense(60,activation='relu')) #Add a fully-connected (Dense) layer  of 60 nodes with 2 input nodes
 model.add(keras.layers.Dense(100,activation='relu')) #Add a 2nd fully-connected (Dense) layer with 100 nodes
 model.add(keras.layers.Dense(60,activation='relu')) #Add a 3rd fully-connected (Dense) layer with 60 nodes
 model.add(keras.layers.Dense(1,activation='relu'))  #A single node in the output layer
@@ -50,7 +51,7 @@ model.add(keras.layers.Dense(1,activation='relu'))  #A single node in the output
 # ## Compile the network
 
 # +
-model.compile(loss="mean_squared_error",optimizer=keras.optimizers.SGD(lr=0.1),metrics=['accuracy']) 
+model.compile(loss="mean_squared_error",optimizer=keras.optimizers.SGD(learning_rate=0.1),metrics=['accuracy']) 
 #Compile the network with mean squared error loss function
 # and stochastic gradient descent optimiser with learning rate of 0.1
 
@@ -63,7 +64,7 @@ model.compile(loss="mean_squared_error",optimizer=keras.optimizers.SGD(lr=0.1),m
 # ## Read in our image
 # Now we need to read in our image and flip it around so that the bottom left corner can be indexed as 0,0
 
-input_img = imageio.imread('http://www.hep.ucl.ac.uk/undergrad/0056/other/313px-William_Henry_Bragg_Nobel_bw.jpg')
+input_img = imageio.v2.imread('http://www.hep.ucl.ac.uk/undergrad/0056/other/313px-William_Henry_Bragg_Nobel_bw.jpg')
 pixel_image=np.transpose(input_img) # have to transpose...
 pixel_image=pixel_image[:,::-1] # and flip... to get the right view!
 pixel_image-=pixel_image.min()
@@ -150,10 +151,7 @@ im=ax.imshow(imgFunction(X0,X1),interpolation='nearest',origin='lower',cmap='pla
 cb = fig.colorbar(im) #Get the colorbar for the range of z values
 ax.axis('off')
 
-x = np.array([1, 0.5, 0.2, 3,1,  13,   7, 3, -13, 3])
-
-y=np.exp(x)/np.sum(np.exp(x))
-with np.printoptions(precision=5, suppress=True):
-    print(y)
+# ## Suggested tasks
+# Can you make a better image reproduction?
 
 

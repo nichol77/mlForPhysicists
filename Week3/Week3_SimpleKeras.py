@@ -179,4 +179,37 @@ ax.legend()
 # ### Exercise 2: Try other functions
 # Are some functions easier to model than others? What types of functions are the most difficult to model?
 
+# +
+
+modelBack = keras.models.Model(inputs=input_layer, outputs=Layer_2)
+modelBack.summary()
+backOut=modelBack.predict_on_batch(y_in)
+print("Input shape",np.shape(y_in))
+print("backOut shape",np.shape(backOut))
+
+# +
+
+colorList=plt.rcParams['axes.prop_cycle'].by_key()['color']
+fig, ax = plt.subplots(4,3,sharex=True) 
+# Remove vertical space between Axes
+fig.subplots_adjust(hspace=0)
+# Remove horizontal space between Axes
+fig.subplots_adjust(wspace=0)
+for i in range(len(backOut[0])):
+    j=i%3
+    k=i//3
+    ax[k,j].plot(y_in,backOut[:,i],label="Neuron "+str(i),color=colorList[i])
+    #ax[k,j].legend()
+ax[3,1].plot(y_in,y_out2,label="Model 2",color=colorList[0])
+ax[3,1].legend()
+ax[3,2].plot(y_in,target_func(y_in),label="Target",color=colorList[1])
+ax[3,2].legend()
+#ax.set_xlabel("x")
+#ax.set_ylabel("y")
+#ax.set_xlim([-20,20])
+#ax.axvspan(-20,-10,facecolor='lightgrey', alpha=0.5)
+#ax.axvspan(+10,+20,facecolor='lightgrey', alpha=0.5)
+#ax.legend()
+# -
+
 
